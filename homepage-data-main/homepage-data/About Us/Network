@@ -1,0 +1,33 @@
+---
+title: Network
+---
+
+# Collaborations
+
+[The Center for the Cultivation of Technology](https://techcultivation.org)<br />
+The Center for the Cultivation of Technology is a "back-end provider" for the open source community. They work with Robur to assist us in our financial processes and administration.
+
+[Least Authority](https://leastauthority.com)
+Least Authority is a Berlin-based group building technology that is open source and focused on allowing user freedom and privacy protection in online services. Robur has worked with Least Authority to make security audits of OCaml applications.
+
+[MirageOS](https://mirage.io)<br />
+MirageOS is a library operating system that constructs unikernels for secure and high-performing applications. Most Robur projects are designed to be compatible with MirageOS, as well as native operating systems, like Linux or FreeBSD. We work closely with the MirageOS community to help develop its ecosystem and increase the availability of secure applications offered within it.
+
+[OCaml Labs](http://ocamllabs.io)<br />
+OCaml Labs is an initiative within the Cambridge Computer Laboratory started by Anil Madhavapeddy in 2011 to promote research, growth and collaboration within the wider OCaml community. Robur has had a working relationship with OCaml Labs since our inception to help widen the base of OCaml users and applications.
+
+[Tarides](https://tarides.com)<br />
+Is a for-profit distributed engineering team based in Paris and Cambridge that makes software for MirageOS. Robur works alongside Tarides to expand the MirageOS ecosystem and collaborate on some projects.
+
+<br />
+
+# Grant Funders
+
+[NLnet Foundation](https://nlnet.nl)<br />
+In 2019 NLnet Foundation granted Robur funding to develop a secure DNS resolver in OCaml. NLnet is a Dutch foundation that receives money from donations, legacies and collaborative funding and sub-granting mechanisms after starting with substantial capital established by pioneers of the European internet in 1997. It grants money to organizations and people that contribute to an open information society and secure internet projects.
+
+[The Prototype Fund](https://prototypefund.de/en)<br />
+The Prototype Fund has awarded Robur several grants for various projects such as the CalDAV Server, the Mirage Firewall and our OCaml implementation of an OpenVPN client. The Prototype Fund is a funding program of the Federal Ministry of Education and Research (BMBF) that is supported and evaluated by the Open Knowledge Foundation Germany. It funds individuals and small organizations to develop open source applications designed for the common good.
+
+
+

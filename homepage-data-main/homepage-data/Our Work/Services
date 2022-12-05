@@ -1,0 +1,32 @@
+---
+title: Services
+---
+
+We can work with you to design, develop and audit software and infrastructure to assist you in enhancing your technical security and reliability. Whilst we are not a service provider, and so can not offer to host applications, we can assist you in deploying MirageOS and OCaml services.
+
+
+### Design
+Working with you to understand the needs of your organization, and how your software infrastructure is currently setup and used, we can assist you in working out any improvements you might require.
+
+We can consult on design for specific products to ensure you plan the best solution for a single application, or take a more holistic view of your infrastructure and protocols to improve speed, security and ease of use.
+
+We’re experienced in designing and reviewing serialization frameworks, network protocols, cryptographic protocols, and system architectures, and with solutions built on the FreeBSD and Linux operating systems, including sandboxing, hardening and exploit mitigations.
+
+
+### Develop
+Working with [OCaml](/Our%20Work/Technology-Employed#OCaml) and [MirageOS](/Our%20Work/Technology-Employed#MirageOS) we can develop specific applications that give you high assurance of their security and functionality, which seamlessly integrate in your existing infrastructure.
+
+We can also work on a full stack approach to meet your needs and help a smooth migration plan for your organization.
+
+We can bring a variety of solutions, including basic network services, DNS, DHCP, TLS, persistent storage (like git), and are happy to expand these to your needs.
+
+
+### Audit
+We can provide code auditing services, particularly focusing on security and reducing code base. We have team members who have thorough experience working with OCaml, C (embedded, kernel and userspace), x86 assembly, Scala, Java, Android, Haskell, PHP and Python.
+
+Our audits can help ensure your environment is secure whilst also working with you to reduce attack service and increase speed. While we generally prefer “white-box” audits because we believe they yield the best results for the time invested, we also have experience with “black-box” penetration testing.
+
+
+Please [contact us](/Contact) if you are interested in any of the above and we can discuss how we can assist you in developing a more secure architecture and for your organization.
+
+

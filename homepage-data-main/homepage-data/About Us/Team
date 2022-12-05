@@ -1,0 +1,77 @@
+---
+title: Team
+---
+
+Robur is a software development cooperative specializing in robust and secure digital infrastructure written in OCaml.
+
+## Current members
+
+### Hannes
+
+Hannes enjoys living in Berlin, Germany. Until end of 2017, he used to be a research associate at the University of Cambridge in the rems project. He enjoys to write code, and also traveling and repairing his recumbent bicycle, and being a barista.
+
+Hannes did his PhD in computer science about formal verification of imperative code (using a higher-order separation logic and the theorem prover Coq). Hannes co-authored not-quite-so-broken TLS, a TLS implementation from the ground up in OCaml, and contributes to the MirageOS project as a core team member. He is working on various projects, including opam signing and [netsem](https://github.com/rems-project/netsem), an executable formal model of TCP/IP which can act as a test validator.
+
+His blog is at [https://hannes.robur.coop](https://hannes.robur.coop).
+
+### Reynir
+
+Reynir goes foraging, sniffing and picking interesting plants found in nature, cycling with one, two or more wheels, and knits now and then.
+Based in Århus, Denmark he goes winterbathing in the cold sea.
+
+Reynir studied computer science at Aarhus University with an interest in programming languages and formal verification.
+After some years working in industry with heterogenous unix systems followed by two years of various volunteer work he joined Robur in 2020.
+He is still heavily involved as a developer and system administrator in [data.coop](https://data.coop), an association that collectively owns and run servers offering digital services for their members.
+
+
+### rand
+
+rand fell in love with OCaml and functional programming since university, where he studied philosophy and computer science on a humanistic/technological BSc. He especially likes solving problems in elegant and interesting new ways. Been part of the Functional Copenhageners meetup for a range of years - where he's also held several talks.
+
+He's worked fullstack with with OCaml and Scala since university - working on a varied set of things like entity clustering, entity merging, custom data visualizations, service oriented architecture, PostgreSQL, Elasticsearch, natural language parsing, Linux, server management.
+
+Spends much of his time with his daughter and doing experimental art with his video synthesizer `niseq`, of course written using pure FRP in OCaml (:
+
+Can be found at [https://r7p5.earth/](https://r7p5.earth/).
+
+### dinosaure
+
+Dinosaure wants the majority of its services to be unikernels in OCaml. A big reader of RFCs, it implements protocols and formats in OCaml. He has been participating in MirageOS for quite some time and continues to promote its use and develop usable unikernels such as [paste.osau.re](https://paste.osau.re), [bob](https://bob.osau.re), and his [blog](https://blog.osau.re).
+
+## Former members
+
+### Stefanie
+
+Stefanie is an infrastructure software engineer and a researcher.
+
+She studied Applied Computer Science in the Natural Sciences, and developed a typechecker for a compiler of a language for optimization problems. In her PhD project she developed metrics to compare forest data structures, with an application in molecular structure comparison. Working as a postdoc in cancer research on molecular structure prediction, she found her way to Brooklyn and Berlin.
+
+In the US tech industry, she works on infrastructure problems with distributed systems at a large scale with millions of users, developing API infrastructure and search infrastructure, with a focus on stateless systems.
+
+Her Erdős number is 4.
+
+### Martin
+
+Martin has been programming since before programming was trendy, eating Sharp SC61860A machine code for breakfast since before it was healthy, and using Linux way back when it was just Linus Torvalds’ glorified terminal emulator.
+
+A founding member of Unikernel Systems (later acquired by Docker), Martin has been involved in a number of library operating system projects since 2014, including the Rumprun unikernel and MirageOS. He is a co-author of Solo5, a secure execution environment for unikernels, and joins Robur in 2018 to continue his work towards creating secure software that “just works” and other ambitious projects.
+
+Martin lives with his family in Bratislava, Slovakia and in his spare time enjoys hiking, yachting and the arts.
+
+### Mindy
+
+Mindy ran the first MirageOS unikernel in the public cloud in 2014. Mindy has worked extensively on the MirageOS TCP/IP network stack and various protocol implementations, and is a member of the project's core team. She managed the release of MirageOS's latest major version.
+
+Mindy is interested in freeing software from unnecessary dependencies, including monolithic kernels. While she finds testing and bug-fixing rewarding, her true goal is to apply techniques that remove entire bug classes to broader classes of computation. Memory safety isn't just for application code!
+
+In her free time, Mindy enjoys bothering cats, playing board games, riding bicycles, and embroidery. She lives in beautiful Madison, Wisconsin in the United States.
+
+### Joe
+
+Joe is an independent IT consultant located in Copenhagen.
+
+Joe has a background in penetration testing, protocol design, applied cryptography, and architectural IT security system design for customers, especially in the banking, insurance, and pension fund sectors. He has been consulting on BPAY integration in Australia, and conducting web and network security assessments for customers throughout the world.
+
+Lately he has spent the last couple of years writing OCaml and has been working with IT security, dev-ops and automated deployment for customers specializing in Enterprise Resource Planning, Internet of Things, and medical technology.
+
+In his spare time he dabbles in research into similar topics and serialization frameworks, in addition to the enjoyable pursuit of tabletop roleplaying and social interactions in smoky pubs - two disciplines that he excels in, but that have somehow not been of particular interest to paying customers (yet).

@@ -1,0 +1,39 @@
+---
+title: Our Approach
+---
+
+We are a nonprofit open source software cooperative whose mission is to develop robust and secure digital infrastructure. We strive to enable more people to reliably run their own infrastructure by producing correct, surprise-free software to be deployed in real environments. Our software aims to meet the needs of anyone working in an environment where security and dependability is vital.
+
+We write all our code in a high-level memory-safe (and more secure) programming language called [OCaml](/Our%20Work/Technology-Employed#OCaml). In addition each piece of software leverages [MirageOS](/Our%20Work/Technology-Employed#MirageOS) (a minimal operating system) to produce bespoke applications tailored to only contain their required functionality. Each service is executed on virtual machines with a size usually around 1-10 MB, much smaller than a UNIX / Linux system, and it boots within milliseconds.
+
+Where other approaches try to patch general purpose operating systems by adding more layers, we strive to build a secure system from the ground up.
+
+Our approach means our software has a number of security and ease-of-use benefits:
+- each application is small and fast to start
+- our software can be run on all major hypervisors and is ready for the cloud
+- we are able to provide rapid prototyping with a seamless path from prototype to production
+- reduced attack vectors, for example by guarding against things like memory corruption
+- a small code base which means a smaller attack surface, and easier review and audit
+- the complexity is reduced ensuring ease of use and helping people to understand the technology
+- it is possible to formally verify important parts with a proof assistant (proof writing software)
+
+
+We work with [clients](/Our%20Work/Services), [partners](/About%20Us/Network#Collaborations) and [funders](/About%20Us/Network#Grant-Funders) to design and develop open-source protocols and applications within this approach.
+
+If you are interested in seeing how we can assist you in improving your organization's digital infrastructure please see our [services offered](/Our%20Work/Services).
+
+If you like our approach to open source software and want to support our work please consider a [donation](/Donate).
+
+Or if you are a funder of open source projects focused on security and reliability and like our approach we would love to hear from [you](/Contact).
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,101 @@
+---
+title: Technology Employed
+---
+
+# MirageOS
+
+MirageOS is a software suite to build custom-tailored operating systems from (mostly open source) small individual libraries. It has been developed since 2009 at the University of Cambridge, UK and is written in the programming language [OCaml](/Our%20Work/Technology-Employed#OCaml).
+
+It compiles the necessary OCaml libraries into a unikernel - a small operating system, each built for a certain purpose. For each unikernel we can pick from hundreds of permissively licensed open source libraries which implement network protocols, storage on block devices, or interfaces to network devices via the hypervisor or host operating system. As we only put into each one exactly what is needed, each unikernel is fast; instantly booting and, as there is less code base, it is easier to maintain and keep secure.
+
+As an example to see how lines of code compare, here are the number of lines of code needed for different elements of our [Bitcoin Pinata](/Our%20Work/Projects#Bitcoin%20Pinata), measured in thousands of lines of code:
+
+<table>
+<tr><th></th><th>Linux</th><th>MirageOS</th></tr>
+<tr><td>Kernel</td><td>1600</td><td>48</td></tr>
+<tr><td>Runtime</td><td>689</td><td>25</td></tr>
+<tr><td>Crypto</td><td>230</td><td>23</td></tr>
+<tr><td>TLS</td><td>41</td><td>6</td></tr>
+<tr><td>Total</td><td>2560</td><td>102</td></tr>
+</table>
+
+MirageOS is an event-based operating system - it can manage tasks asynchronously. A task gives up the CPU it was using once its execution is finished, or if it has to wait for input. This model leads to a cooperative multitasking programming style, which is much less error prone to one that multi-tasks.
+
+A recent example for code which is not safe that used multitasking is in Ethereum, which lead to a huge amount of the cryptocurrency ether being stolen. Even established software like the Firefox JavaScript engine, or PHP shows similar problems on a regular basis.
+
+#### More Technical Information on MirageOS:
+
+MirageOS is a library operating system where specialization of the running image is done at compile-time. It contains only the runtime system and application code, rendering all of the usual operating system kernel services obsolete, for example our DNS unikernel only needs OCaml runtime and UDP stack, not a full TCP/IP stack. Time and other resources from the OS are explicit instead of implicit, so if a random number generator, console, network interface or file system are needed they are explicitly configured. The simple design of the runtime, with smaller images, create a very fast runtime and MirageOS can boot in just milliseconds.
+
+MirageOS unikernels are clean slate operating systems, not POSIX compatible, that are written in a high level functional language, OCaml. The minimal code base, with minimal use of mutable state, allows us to reason about entire systems with adherence to specification. This leads to single-purpose systems with a minimal attack surface, where lots of layers of complexity (file system, scheduler, process management, virtual memory subsystem) are avoided.
+
+These unikernels can be a compiled natively as UNIX processes (with a size of about 4% of a UNIX based system), allowing for testing and debugging in a UNIX environment, and can then be deployed as a standalone virtual machine on a cloud service or hypervisor. On top of the hypervisor, a small layer of C code unifies the interface on which OCaml runs but there is no need to carry the whole C library.
+
+MirageOS targets "standard" UNIX processes, Xen, Qubes, and Solo5 (which in turn [supports numerous targets](https://github.com/Solo5/solo5/blob/master/docs/building.md#supported-targets)). With regards to hardware processors MirageOS compiles to native code on ARM64, x86 and x86_64.
+
+There are generally three ways to feed the virtual machine with configuration data, like network configuration or TLS certificate and key:
+
+* compile the information into the virtual machine image, which requires recompilation on configuration change
+* pass the information as boot parameters, which requires reboot on configuration change
+* store this information in a virtual block device attached to the virtual machine.
+
+In MirageOS we use a simple declarative configuration management model with localized reasoning. For example, logs can be written from the unikernel to a syslog collector with UDP, TCP, or TLS as transport. The transport needs to be chosen at compile-time because TLS requires the TLS library to be linked into the kernel image, but the log destination is passed as boot parameter. We use unified logging throughout via syslog.
+
+A task yields the CPU once at regular intervals throughout its execution, for example when waiting for I/O, or for other tasks to perform work upon which the task depends. This concurrency model leads to a cooperative multitasking programming style, rather than the error prone preemptive multitasking, where each code block needs to make sure to use appropriate locking strategies to avoid re-entrant execution errors.
+
+The virtual memory subsystem in contemporary operating systems provides an address mapping for each process. MirageOS unikernels consist of a single CPU execution context and so use a single address space. This severely limits overhead from context switching that is prevalent in traditional operating systems. Spatial memory safety between tasks is achieved statically through leveraging the OCaml type system at compile-time, instead of at run-time using virtual memory as done in traditional operating system.
+
+A number of protocols have already been implemented in MirageOS, with more each year. We focus on fast, secure and robust implementations so we only implement the sensible features for each protocol. OCaml supports exceptions, but writing interfaces that throw exceptions requires rigorous discipline on behalf of the caller in terms of exception handling, and it requires the library author to be disciplined about documenting them. We have a policy of limiting the use of exceptions in MirageOS code and instead relying on explicit return types that encode errors explicitly, meaning the user is confronted with failure modes while writing their application code, and encouraged to handle them.
+
+Currently supported protocols, all written from scratch in OCaml, include: HTTP, DNS, DHCP (server and client), BGP, TCP/IP, IPv4, git, TLS, Lets Encrypt, OpenPGP, Prometheus, SNMP, SSH, OTR and syslog. We also have some visualizations including some terminal based UIs, a firewall, VPN and a crypto library.
+
+As some examples of the comparable code base sizes of these protocol implementations and applications our TLS library, which is inter-operable with most stacks, has a code base of roughly 4% of other implementations. We have had an authoritative name service running consistently since December 2016 which is only a 2MB VM image, and our firewall has been used in Qubes and instead of a 200MB VM it is max 50MB.
+
+
+<br />
+<br />
+<br />
+
+
+# OCaml
+
+OCaml is a mature programming language that is used both in industry (Facebook, Jane Street Capital, Docker, ahrefs, simcorp, lexifi) and academia.
+
+A large reason MirageOS and Robur software have security advantages over other technical projects is the programming language used - OCaml.
+
+OCaml is a functional programming language - the way in which one is forced to construct code minimizes potential bugs in the code, for example by remembering what events have taken place already in the code and not allowing these states to change unless specifically changed. All inputs, outputs and effects of a function are known.
+
+OCaml also helps avoid many common programming errors through automated memory management to avoid memory corruption, and type checking.
+
+OCaml's speed once complied is comparable to C code, one of the fastest languages. OCaml can also be compiled to JavaScript, so both client and server side of a web application can be developed in the same language, allowing for easier understanding of the full application and enhancing security.
+
+
+#### More Technical Information on OCaml:
+
+### Concepts of the Language
+
+OCaml is a functional programming language with declarative code that minimizes side effects and mutable state. Its functional programming concepts give us a list of security advantages for MirageOS. OCaml avoids the root causes of common flaws in computer security and exploits in a number of ways.
+
+It is a memory safe language so the behavior of our core protocol logic is only dependent on arguments not arbitrary memory, avoiding memory corruption. OCaml's strings are immutable by default and type checking allows us to avoid many common programming errors, including guarding against leaky abstraction.
+
+A major advantage of functional programming is localized reasoning about program code. All inputs, outputs and effects of a function are known. Immutable data structures and cooperative multitasking allow us to reason about the state of the entire system, even if we use parallelism and complex distributed systems.
+
+OCaml lends itself by default to a programming style with explicit error handling. OCaml provides for isolated side effects like timers, IO and mutable state which is then giving an effectful layer on top of the pure protocol logic for the side effects. OCaml does supports exceptions, but they are not present in the type signatures \[of functions] (unlike Java), and thus from the outside (e.g. when calling a function), it is not clear whether exceptions can be raised or not. For that reason, the coding style of exception-based error handling is avoided in MirageOS. Instead of relying on exceptions, we employ explicit error handling using result types and an error monad.
+
+### Verification
+
+A large subset of the OCaml semantics has been mechanically proven sound in a proof assistant.
+
+OCaml is the implementation language of the well-known proof assistant Coq. Development in Coq can be extracted to OCaml code, as demonstrated by CompCert, a formally verified optimizing C compiler, in order to be compiled and executed. The opposite direction is also possible: OCaml code can be translated into Coq definitions (using Coq of OCaml).
+
+### Compilation
+
+OCaml code compiles to native code, which is competitive, and comparable to compiled C code. As an example, our TLS library has up to 85% of the bulk throughput of OpenSSL (using AES128-CBC). The TLS handshake performance is comparable with OpenSSL.
+
+The OCaml compiler generates native code for x86, arm, etc., and has a bytecode backend, which can target microcontrollers (PIC18 family in the OcaPIC project). OCaml can also be compiled to JavaScript, so both client and server side of a web application can be developed in the same language with shared interface code (more details at the Ocsigen project).
+
+In 2016, Facebook developed ReasonML, a dialect of OCaml which syntax is closer to JavaScript, and easier to comprehend for beginners coming from that family of programming languages. ReasonML and OCaml code can be easily combined into a single application, since they use the same compiler.
+
+### Further Information
+
+There is active work on OCaml language development and its runtime system. More literature on why OCaml is a good choice has been written by Yaron Minsky (Jane Street) in the article [OCaml for the masses](https://queue.acm.org/detail.cfm?id=2038036), and more recently by the crypto-ledger [Tezos](https://tezos.com/static/position_paper-841a0a56b573afb28da16f6650152fb4.pdf).

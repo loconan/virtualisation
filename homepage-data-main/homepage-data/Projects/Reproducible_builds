@@ -1,0 +1,160 @@
+---
+title: Robur Reproducible Builds
+---
+
+In 2021 we in [Robur](https://robur.coop/) have been working towards easing deployment of reproducible mirage applications. The work has been funded by the European Union under the [Next Generation Internet (NGI Pointer) initiative](https://pointer.ngi.eu/). The result is [online](https://builds.robur.coop).
+
+The overall goal is to push MirageOS into production in a trustworthy way. We worked on reproducible builds for [Opam](https://opam.ocaml.org) packages and [MirageOS](https://mirageos.org) - with the infrastructure being reproducible itself. Reproducible builds are crucial for supply chain security - everyone can reproduce the exact same binary (by using the same sources and environment), without reproducible builds we would not publish binaries.
+
+Reproducible builds are also great for fleet management: by inspecting the hash of the binary that is executed, we can figure out which versions of which libraries are in the unikernel - and suggest updates if newer builds are available or if a used library has a security flaw -- `albatross-client-local update my-unikernel` is everything needed for an update.
+
+Several ready-to-use MirageOS unikernels are built on a daily basis - ranging from [authoritative DNS servers](https://builds.robur.coop/job/dns-primary-git/) ([secondary](https://builds.robur.coop/job/dns-secondary/), [let's encrypt DNS solver](https://builds.robur.coop/job/dns-letsencrypt-secondary/)), [DNS-and-DHCP service (similar to dnsmasq)](https://builds.robur.coop/job/dnsvizor/), [TLS reverse proxy](https://builds.robur.coop/job/tlstunnel/), [Unipi - a web server that delivers content from a git repository](https://builds.robur.coop/job/unipi/), [DNS resolver](https://builds.robur.coop/job/dns-resolver/), [CalDAV server](https://builds.robur.coop/job/caldav/), and of course your own MirageOS unikernel.
+
+## Brief robur and MirageOS introduction
+
+[MirageOS](https://mirageos.org) is an operating system, developed in OCaml, which produces unikernels. A unikernel serves a single purpose and is a single process, i.e. only has the really needed dependencies. For example, an OpenVPN endpoint does neither include persistent storage (block device, file system) nor user management. MirageOS unikernels are developed in [OCaml](https://ocaml.org), a statically typed and type-safe programming language - which avoids common pitfalls from the grounds up (spatial and temporal memory safety issues).
+
+[Robur](https://robur.coop) is a collective that develops MirageOS and OCaml software with open source license. It was started in 2017, and is part of the non-profit company [center for the cultivation of technology](https://techcultivation.org). We received funding from several projects ([prototypefund](https://prototypefund.de), [NGI pointer](https://pointer.ngi.eu)), donations, and commercial contracts.
+
+## Deploying MirageOS unikernel
+
+To run a MirageOS unikernel on your laptop or computer with virtualization extensions (VT-x - KVM/BHyve), you first have to install the `solo5` and `albatross` packages. Afterwards you need to setup a virtual network switch (a bridge interface) where your unikernels will communicate, and forwarding.
+
+### Host system package installation
+
+For Debian and Ubuntu systems, we provide package repositories. Browse the [dists](https://apt.robur.coop/dists) folder for one matching your distribution, and add it to `/etc/apt/sources.list`:
+```
+$ wget -q -O /etc/apt/trusted.gpg.d/apt.robur.coop.gpg https://apt.robur.coop/gpg.pub
+$ echo "deb https://apt.robur.coop ubuntu-20.04 main" >> /etc/apt/sources.list # replace ubuntu-20.04 with e.g. debian-11 on a debian buster machine
+$ apt update
+$ apt install solo5 albatross
+```
+
+On FreeBSD:
+```
+$ fetch -o /usr/local/etc/pkg/robur.pub https://pkg.robur.coop/repo.pub # download RSA public key
+$ echo 'robur: {
+  url: "https://pkg.robur.coop/${ABI}",
+  mirror_type: "srv",
+  signature_type: "pubkey",
+  pubkey: "/usr/local/etc/pkg/robur.pub",
+  enabled: yes
+}' > /usr/local/etc/pkg/repos/robur.conf # Check https://pkg.robur.coop which ABI are available
+$ pkg update
+$ pkg install solo5 albatross
+```
+
+For other distributions and systems we do not (yet?) provide binary packages. You can compile and install them using [opam](https://opam.ocaml.org) (`opam install solo5 albatross`). Get in touch if you're keen on adding some other distribution to our reproducible build infrastructure.
+
+There is no configuration needed. Start the `albatross_console` and the `albatross_daemon` service (via `systemctl daemon-reload ; systemctl start albatross_daemon` on Linux or `service albatross_daemon start` on FreeBSD). Executing `albatross-client-local info ` should return success (exit code 0) and no running unikernel. You may need to be in the albatross group, or change the permissions of the Unix domain socket (`/run/albatross/util/vmmd.sock` on Linux, `/var/run/albatross/util/vmmd.sock` on FreeBSD).
+
+To check that albatross works, get the latest hello world unikernel and run it:
+```
+$ wget https://builds.robur.coop/job/hello/build/latest/bin/hello.hvt
+$ albatross-client-local console my-hello-unikernel & # this is sent to the background since it waits and displays the console of the unikernel named "my-hello-unikernel"
+$ albatross-client-local create my-hello-unikernel hello.hvt # this returns once the unikernel image has been transmitted to the albatross daemon
+$ albatross-client-local create --arg='--hello="Hello,\ my\ unikernel" my-hello-unikernel hello.hvt # executes the same unikernel, but passes the boot parameter "--hello"
+$ fg # back to albatross-client-local console
+$ Ctrl-C # kill that process
+```
+
+Voila, we have a working albatross installation. Albatross also supports a remote client (using a TLS handshake) `albatross-client-bistro`, monitoring of unikernels (`albatross_stat` and `albatross_influx` services), and a TLS endpoint (via inetd with `albatross-tls-inetd`).
+
+### Network for your unikernel
+
+Next we want to setup networking for our unikernels. We use a so-called "bridge" interface for this, which is a virtual network switch where you connect "tap" interfaces (layer 2 ethernet devices). A MirageOS unikernel uses tap interfaces for communication. We give our bridge the name "service" (and for example for monitoring and management you may want to setup another bridge "management").
+
+If you're using a network manager that is capable of setting up bridge interfaces, use that interface.
+
+If not, on Linux you can add the following to `/etc/network/interfaces` (the reason for adding a dummy interface to the bridge is that otherwise Linux uses the mac address of the first connected tap interface, and there'll be rather confusing issues):
+```
+auto service
+# Host-only bridge
+iface service inet manual
+    up ip link add service-master address 02:00:00:00:00:01 type dummy
+    up ip link set dev service-master up
+    up ip link add service type bridge
+    up ip link set dev service-master master service
+    up ip addr add 10.0.42.1/24 dev service
+    up ip link set dev service up
+    down ip link del service
+    down ip link del service-master
+```
+
+On FreeBSD, add the following to `/etc/rc.conf`:
+```
+cloned_interfaces="bridge0"
+ifconfig_bridge0_name="service"
+ifconfig_service="inet 10.0.42.1/24"
+```
+
+Afterwards either restart your system or re-run the service scripts to have the bridge setup in your running system.
+
+To check that the networking works, get the latest static website unikernel and run it:
+```
+$ wget https://builds.robur.coop/job/static-website/build/latest/bin/https.hvt
+$ albatross-client-local console my-website & # this is sent to the background since it waits and displays the console of the unikernel named "my-website"
+$ albatross-client-local create --net=service --arg='--ipv4=10.0.42.2/24' my-website https.hvt # this returns once the unikernel image has been transmitted to the albatross daemon
+$ ping 10.0.42.2 # should receive answers
+$ open http://10.0.42.2 # in your browser - also https://10.0.42.2 (you'll get a certificate warning)
+$ wget http://10.0.42.2/ # should download the Hello Mirage world!
+$ wget --no-check-certificate https://10.0.42.2/ # should also download the Hello Mirage world!
+$ fg # back to albatross-client-local console
+$ Ctrl-C # kill that process
+$ albatross-client-local destroy my-website # kills the unikernel
+```
+
+When you reached this point, you have successfully launched a MirageOS unikernel, and are able to communicate from your computer with it. This uses the OCaml networking stack, and the host bridge interface.
+
+## Routing and Internet
+
+Your unikernel may want to communicate not only with your host, but also with the Internet. The other way around is also important (the Internet wants to talk with your unikernel).
+
+There are several options, depending on your setup:
+- Your unikernel will be masqueraded (using [NAT](https://en.wikipedia.org/wiki/Network_address_translation)) - some ports may be forwarded to the unikernel,
+- Your computer has several public IP addresses (and put the ethernet device with the ethernet cable on the bridge) and there is an external router,
+- Your computer acts as a router for a subnet.
+
+### NAT
+
+This won't allow your unikernel to be reachable from the outside.You'll need to:
+- enable IPv4 forwarding
+- add a firewall rule
+
+On Linux:
+```
+$ echo "1" > /proc/sys/net/ipv4/ip_forward # enables IP forwarding
+$ iptables -t nat -A POSTROUTING -o enp0s20f0 -j MASQUERADE # replace enp0s20f0 with your network interface
+```
+
+On FreeBSD:
+```
+$ echo 'gateway_enable="YES"' >> /etc/rc.conf # enable IP forwarding
+$ echo 'pf_enable="YES"' >> /etc/rc.conf # enables the packet filter
+$ echo "nat pass on em0 inet from 10.0.42.0/24 to any -> (em0)" >> /etc/pf.conf # replace em0 with your ethernet interface)
+```
+
+### Public IP addresses
+
+To put your unikernels on the same network as your host system, add that external network interface to the bridge:
+
+On Linux, add `up ip link set dev enp0s20f0 master service` in `/etc/network/interfaces` (replace enp0s20f0 with your ethernet interface).
+On FreeBSD, add `ifconfig_service="addm em0"` to `/etc/rc.conf` (replace em0 with your ethernet interface).
+
+### Router
+
+Enable IPv4 forwarding, and setup one IP address on the bridge (replacing the 10.0.42.1/24 above).
+
+## Unikernel execution
+
+Let's test that your unikernels have access to the Internet by using the [traceroute](https://hannes.robur.coop/Posts/Traceroute) unikernel:
+
+```
+$ wget https://builds.robur.coop/job/traceroute/build/latest/bin/traceroute.hvt
+$ albatross-client-local console my-traceroute & # this is sent to the background since it waits and displays the console of the unikernel named "my-traceroute"
+$ albatross-client-local create --net=service --arg='--ipv4=10.0.42.2/24' --arg='--ipv4-gateway=10.0.42.1' my-traceroute traceroute.hvt # the IP configuration depends on your setup, use your public IP address and actual router IP if you've set it up.
+$ fg # back to albatross-client-local console
+$ Ctrl-C # kill that process
+```
+
+That's it. Albatross has more features, such as block devices, multiple bridges (for management, private networks, ...), restart if the unikernel exited with specific exit code, assignment of a unikernel to a specific CPU. It also has remote command execution and resource limits (you can allow your friends to execute a number of unikernels with limited memory and block storage accessing only some of your bridges). There is a daemon to collect metrics and report them to Grafana (via Telegraf and Influx). MirageOS unikernels also support IPv6, you're not limited to legacy IP.

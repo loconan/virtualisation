@@ -1,0 +1,199 @@
+---
+title: Projects
+---
+
+# Robur Reproducible Builds
+
+In 2021 we in [Robur](https://robur.coop/) have been working towards easing deployment of reproducible mirage applications. The work has been funded by the Eurepean Union under the [Next Generation Internet (NGI Pointer) initiative](https://pointer.ngi.eu/). The result is [online](https://builds.robur.coop).
+
+The overall goal is to push MirageOS into production in a trustworthy way. We worked on reproducible builds for [Opam](https://opam.ocaml.org) packages and [MirageOS](https://mirageos.org) - with the infrastructure being reproducible itself. Reproducible builds are crucial for supply chain security - everyone can reproduce the exact same binary (by using the same sources and environment), without reproducible builds we would not publish binaries.
+
+Reproducible builds are also great for fleet management: by inspecting the hash of the binary that is executed, we can figure out which versions of which libraries are in the unikernel - and suggest updates if newer builds are available or if a used library has a security flaw -- `albatross-client-local update my-unikernel` is everything needed for an update.
+
+Several ready-to-use MirageOS unikernels are built on a daily basis - ranging from [authoritative DNS servers](https://builds.robur.coop/job/dns-primary-git/) ([secondary](https://builds.robur.coop/job/dns-secondary/), [let's encrypt DNS solver](https://builds.robur.coop/job/dns-letsencrypt-secondary/)), [DNS-and-DHCP service (similar to dnsmasq)](https://builds.robur.coop/job/dnsvizor/), [TLS reverse proxy](https://builds.robur.coop/job/tlstunnel/), [Unipi - a web server that delivers content from a git repository](https://builds.robur.coop/job/unipi/), [DNS resolver](https://builds.robur.coop/job/dns-resolver/), [CalDAV server](https://builds.robur.coop/job/caldav/), and of course your own MirageOS unikernel.
+
+[read more](/Projects/Reproducible_builds)
+
+# Bitcoin Piñata
+
+The [Bitcoin Piñata](http://ownme.ipredator.se) is a transparent [bug bounty](https://en.wikipedia.org/wiki/Bug_bounty_program): it holds the private key for a bitcoin wallet. It is a [MirageOS unikernel](/Our%20Work/Technology-Employed#MirageOS) designed to test our TLS and all underlying transport implementations.
+
+Its open communication channels are HTTP and HTTPS, and a TLS client and TLS server endpoint, all written in [OCaml](/Our%20Work/Technology-Employed#OCaml). The cryptographic material for TLS is generated on startup in the Piñata and is supposed to never leave it. However, if an attacker manages to establish a mutually authenticated (using certificates) TLS channel, the private key to the bitcoin wallet is transmitted over this channel, and the attacker gains access to the bait (the bitcoins).
+
+The project was [launched](https://mirage.io/announcing-bitcoin-pinata) on February 10th 2015. At this time friends from the IPredator project lent us 10 bitcoins (back then worth ~2000 EUR) for the bait. By 2018 no one had successfully cracked the Piñata and the bitcoins, by this point worth ~200 000 EUR, were repurposed for other projects, however the project remains live, with a small amount of bitcoins in it, for anyone wishing to try to crack it.
+
+[Hannes Mehnert](/About%20Us/Team) and David Kaloper-Meršinjak designed the Bitcoin Piñata to attract security professionals to look into our [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) stack, developed purely in OCaml since early 2014.
+
+
+#### More technical information:
+
+On startup, the Piñata generates its certificate authority on the fly, including certificates and private keys, this means that only the Piñata itself contains private keys which can authenticate successfully.
+
+The codebase is [thousands of lines of code smaller](/Our%20Work/Technology-Employed#MirageOS) than equivalent implementations and we did not use many external libraries, and those we had to use we read carefully to avoid security issues.
+
+The attack surface is any part of the unikernel (or deployment) - anything allowing you to get a valid certificate (signed by the cryptographic material which shouldn't leave the Piñata), or reading the memory location where the private key to the bitcoin wallet is stored, an exploitable flaw in any software layer (OCaml runtime, virtual network device, TCP/IP stack, TLS library, X.509 validation, or elsewhere), or anything else.
+
+By using a Bitcoin wallet, the Piñata is a transparent bug bounty.  Everybody can observe (by looking into the blockchain) whether it has been compromised and the money has been transferred to another wallet.  It is also self-serving: when an attacker discovers a flaw, they don't need to fill out any forms to retrieve the bounty, instead they can take the wallet, without any questions asked.
+
+The source code of the Piñata is [open source](https://github.com/mirleft/btc-pinata) and even the running binary (without the private bitcoin wallet key) is published in the git repository.
+
+Further links about the Bitcoin Piñata:
+
+- [Statistics after 5 months](https://mirage.io/blog/bitcoin-pinata-results)
+- [Post about whacking the pinata](https://somerandomidiot.com/blog/2018/04/17/whacking-the-bitcoin-pinata/)
+- [Evaluation 3 years later](https://hannes.nqsb.io/Posts/Pinata)
+- [Usenix security research paper on TLS stack](https://usenix15.nqsb.io)
+
+
+
+# CalDAV Server
+
+The CalDAV server is a protocol for synchronizing calendars. Our goal was to develop a calendar server that is robust and less complex to configure and maintain than other services, allowing more people to run their own digital infrastructure.
+
+The CalDAV server project began in 2017 when [Stefanie Schirmer and Hannes Mehnert](/About%20Us/Team) got a grant from [The Prototype Fund](https://prototypefund.de) for developing a CalDAV server (RFC 4791) over a period of 6 months. After that funding period, [Tarides](https://tarides.com) sponsored us further, allowing us to achieve the current status of the CalDAV server.
+
+Currently all basic features of a calendar are implemented, for example "please add this event to the calendar", and "modify the weekly meeting from now on to start half an hour later", and it is tested with a variety of CalDAV clients.
+
+[calendar.robur.coop](https://calendar.robur.coop) is a live test server with the [calDavZAP](https://www.inf-it.com/open-source/clients/caldavzap/) web user interface, try it with any user and any password (first come first serve), it persists to a remote git repository.
+
+Our CalDAV server has a very small codebase which provides a number of security benefits and it stores all the data in git so there is a history of changes, it can easily be exported and converted to and from other formats, and if a client behaves badly (by removing entries they cannot deal with), this can be tracked and reverted.
+
+We would like to develop the CalDAV server further, adding notifications about updates and invitations sent via Mail (as described in [RFC 6638](https://tools.ietf.org/html/rfc6638)). We also aim to integrate the related protocol CardDAV (address book), which could be integrated into the same unikernel.
+
+If you are interested in supporting further work on the CalDAV server through a [donation](/Donate), with a grant, or require additional features to be implemented to accommodate your project’s needs please [get in touch with us](/Contact)!
+
+
+#### More technical information:
+
+Based on existing HTTP and REST libraries, we developed a WebDAV library adequate for CalDAV (e.g. no locks, but ACLs, reports). The REST library needed some extensions to support more HTTP verbs that are used in WebDAV. We also developed an iCalendar (.ics, RFC 5545) decoder and encoder.
+
+The CalDAV unikernel uses the developed libraries to serve requests from clients, which may be "what is the last update to the calendar?", or adding events or changing times of events. Access control is done by the attached metadata to the resource (i.e. only user Tim may access Tim's calendar, groups are possible). User and group (in WebDAV lingo principals) data are stored in the same storage as the calendars. For enrolling new users and groups, we provide HTTP endpoints. The administrator password is provided as boot argument.
+
+The storage of our CalDAV unikernel can use any [mirage-kv](https://github.com/mirage/mirage-kv) implementation, being it a non-persistent only in-memory (not too useful for a real calendar since it is not persistent), a UNIX file system (if the unikernel runs as a UNIX process), or a remote git repository (which we recommend).
+
+The CalDAV server is open source, with the code available on GitHub for the [server](https://github.com/roburio/caldav) and [calendar](https://github.com/roburio/icalendar).
+
+
+
+# DNS
+
+The Domain Name System is used like a phone book for the internet - it translates human-memoizable domain names (e.g. robur.coop) to machine-routable IP addresses (e.g. 198.167.222.215) and other records such as where eMail should be sent to. DNS is a fault-tolerant hierarchical decentralized key-value store with caching. DNS has been deployed on the Internet since 1987.
+
+On the one side, the authoritative server, which has delegated responsibility for a domain, provides that mapping information (i.e. that a certain IP is the right one for a certain domain), and on the other side a resolver provides the functionality to figure out which server to request for each query a client has.
+
+Since 2017 we have developed DNS, server, resolver, and client as a spare-time project. They serve different purposes in our ecosystem: the server is used by domains such as nqsb.io and robur.coop as an authoritative server; we use a caching resolver for our bi-annual hack retreats in Marrakesh; and the client is used by any MirageOS unikernel that needs to resolve domain names.
+
+When developing this project we carefully considered which elements were strictly required and have ensured a minimal codebase, providing for better security and ease of use.
+
+Since mid-August 2019 our DNS implementation replaced the existing, but incomplete and barely maintained [OCaml](/Our%20Work/Technology-Employed#OCaml) implementation. It is released to the opam repository.
+
+A specific use case for this project is to combine a DNS resolver with a local zone (where it acts as server), and a DHCP server - a protocol used for dynamic IP address configuration - into a single service. We recently received confirmation of a grant from Nlnet via the next generation internet initiative from the EU to develop such a service based on our DNS library.
+
+If you are interested in supporting this work, or knowing more about it please [get in touch with us](/Contact).
+
+
+#### More technical information:
+
+Our DNS implementation handles extensions such as dynamic updates, notifications on changes, authentication of update requests, zone transfers (all useful for provisioning X509 certificates via letsencrypt.org).
+
+Using expressive types in OCaml we can ensure that for a given query type the reply record has a specific shape: querying an address record (A) results in a set of IPv4 addresses. Encoding such invariants in the type system reduces the boilerplate (or unsafety) which is there in other implementations.
+
+The DNS code is available on GitHub for the [library](https://github.com/mirage/ocaml-dns) and [unikernels](https://github.com/roburio/unikernels).
+
+
+
+# Firewall
+
+Online security is vital and an important way to improve a network's or computer's security is a firewall that can block unwanted traffic going in and out. We are developing a lightweight firewall in the secure programming language [OCaml](/Our%20Work/Technology-Employed#OCaml) that is specifically designed to be implemented in [QubesOS](https://www.qubes-os.org/), a security-orientated operating system.
+
+The Qubes-Mirage-Firewall is based on a project by Thomas Leonard. It is implemented as a [MirageOS unikernel](/Our%20Work/Technology-Employed#MirageOS), it is more lightweight and with a smaller codebase compared to the original Linux based firewall in QubesOS which has security and useability benefits.
+
+In 2019, we received a grant from [The Prototype Fund](https://prototypefund.de) for 6 months work on this project. We would like to continue developing it further and if you wish to support this project with a [donation](/Donate), grant, or just want to hear more about the project please [get in touch with us](/Contact).
+
+#### More technical information:
+
+Thus far we have refactored the NAT library, made the firewall react to rule changes from the Qubes interface, and added a DNS client to the firewall. We added the ability to read rule changes from QubesDB. We added the ability to resolve domain names via a DNS client so that the rules can be written in a human-friendly way, and not just as computer-friendly IP addresses.
+
+The smaller unikernel uses less memory, which is a rare resource in QubesOS, since Qubes runs many virtual machines. As opposed to the first prototype, it can react to rule changes without the need to rebuild and reboot the firewall VM.
+
+The code for the firewall is on [GitHub](https://github.com/yomimono/qubes-mirage-firewall/), but still on several branches since we recently reworked the DNS parts.
+
+# OpenPGP
+
+OpenPGP is a much-used standard of encryption and is widely used to encrypt text, files and emails, amongst other things.
+
+Robur is implementing OpenPGP in OCaml, for use in MirageOS and any other compatible platform or software that is looking for OpenPGP written in a [secure language](/Our%20Work/Technology-Employed#OCaml).
+
+This work is funded through donations and is still an ongoing project, which means that it may not currently possess all the features required for various use-cases. Currently our implementation can sign, verify, compress, encrypt and decrypt.
+
+You can assist us in implementing more of the OpenPGP protocol through a [donation](/Donate). If you are interested hearing more about the project, require additional features to be implemented to accommodate your project’s needs, or are able to assist with a grant please [get in touch with us](/Contact)!
+
+
+#### More technical information:
+
+Robur maintains a partial, opinionated implementation of OpenPGP version 4 (RFC 4880) and the related standards, written in OCaml and compatible with MirageOS.
+
+The software consists of a library, and various UNIX tools that make use of the library, and can be used to interact with systems that are currently using GnuPG or other OpenPGP implementations for file encryption or verification using OpenPGP signatures. Notably it can be used from within MirageOS applications without having to bundle a C implementation, and the UNIX binaries are separated from the library so that your applications can use the library directly, unlike GnuPG or libgpgme whose API translates to repeated executions of the gpg2 binary and parsing of the textual output from that.
+
+Currently we have implemented signing/verification and encryption/decryption, but there is no support for elliptic curve cryptography. Decompression of ZLIB streams is supported through the use of a pure OCaml library called decompress. While some things are implemented with a streaming API, many operations make use of an in-memory buffer, which introduces memory constraints on the file handled (this is an area where there is definitely room for improvement).
+
+The software is available [on Github](https://github.com/roburio/ocaml-openpgp).
+
+
+
+# OpenVPN
+
+OpenVPN is a virtual private network protocol that started from a single implementation developed in C, without any specification document. Over time flaws were found in the implementation which lead to further revisions. Also several extensions were developed for coping with other needs.
+
+This history meant that overall OpenVPN has a number of flaws and is overly complex due to revisions on revisions. We implemented only the most recent protocol version and require the current key derivation and authentication method.
+
+We started from scratch developing it in [OCaml](/Our%20Work/Technology-Employed#OCaml) using existing cryptographic libraries and parsers. This approach allowed us to take some design decisions that have security benefits and our codebase is minimal. We strive for compatibility of the configuration file, so our OCaml OpenVPN can be a drop-in replacement.
+
+We began this work in 2018 with a grant from [The Prototype Fund](https://prototypefund.de). Whilst the code is available on [Github](https://github.com/roburio/openvpn) we have not released it yet as it needs further work (in terms of testing, performance evaluation).
+
+If you are interested in supporting further work on our OpenVPN implementation through a [donation](/Donate), with a grant, or just want to hear more about the project please [get in touch with us](/Contact)!
+
+
+#### More technical information:
+
+Our main goal is a client implementation as a MirageOS unikernel (either forwarding all traffic to a single IP address or NAT of a local network via the OpenVPN tunnel), but we also developed a UNIX client which configures a tap device on the host and adjusts the hosts routing table accordingly. We extended our protocol implementation with a server as well. Testing is done against existing OpenVPN servers.
+
+Our implementation has stronger security promises since we do not implement old protocol versions that are brittle. In addition it is fail-hard when using the NAT unikernel: if the tunnel is down, all packets are dropped (instead of sent unencrypted). We do not support questionable configuration options and we have safe defaults for the configuration.
+
+
+
+
+# Solo5
+
+Solo5 is a sandboxed (separated) execution environment  built using unikernels (a.k.a. library operating systems), including but not limited to MirageOS unikernels. Conceptually it provides a common interface between the unikernel and various host operating systems or hypervisors.
+
+Solo5's interfaces are designed in a way that allows us to easily port them to run on different host operating systems or hypervisors. Implementations of Solo5 run on Linux, FreeBSD, OpenBSD, the Muen Separation Kernel and the Genode Operating System Framework.
+
+Currently Solo5 is ready for use by early adopters and we plan to continue developing it further, if you are interested in supporting this development with a [donation](/Donate) or want to hear more about the project please [get in touch with us](/Contact).
+
+
+#### More technical information:
+
+
+Solo5 features include:
+
+* a sandboxed environment (CPU, memory) to execute native code in
+* clock interfaces to access system time
+* network interfaces to allow the unikernel to communicate with the outside world
+* block storage interfaces to allow the unikernel to store persistent data
+* an output-only "console" interface for logging and debugging
+
+Solo5 has been designed to isolate the unikernel as much as possible from its host, while making the best of the available isolation technologies that the host hardware, operating system or hypervisor provide, such as hardware-assisted virtualization, system call filtering and so on. Interfaces are intentionally designed to treat the unikernel as a "static system". In other words, the unikernel must declare its intent to make use of host resources (such as memory, network or storage) up front, and can not gain access to further host resources at run time.
+
+Compared to existing technologies, such as traditional virtualization using KVM/QEMU, VMWare, crosvm and so on, Solo5 is several orders of magnitude smaller (around 10,000 lines of C) and is tailored to running unikernels in a legacy-free and minimalist fashion.
+
+Our goal for Solo5 is to enable the use of unikernel technology to build hybrid, disaggregated systems where the designer/developer can choose which components are untrusted or security-sensitive and "split them out" from the monolithic host system. At the same time the developer can continue to use existing, familiar, technology as the base or "control plane" for the overall system design/deployment, or mix and match traditional applications and unikernels as appropriate.
+
+The software is available [on Github](https://github.com/solo5).
+
+
+
+
+
+
+

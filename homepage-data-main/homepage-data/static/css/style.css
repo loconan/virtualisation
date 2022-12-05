@@ -1,0 +1,154 @@
+html {
+    background-color: #fafafa;
+    font-family: medium-content-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;
+    font-size: 21px;
+}
+
+html a {
+    text-decoration: none;
+    color: black;
+    text-decoration: underline;
+}
+
+html a:visited {
+    color: black;
+    text-decoration: underline;
+}
+
+.navbar {
+    box-sizing: border-box;
+    box-shadow: 0 2px 2px -2px rgba(0,0,0,.15);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: rgba(255,255,128,1);
+    text-decoration: none;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+blockquote {
+    font-style: italic;
+    padding: 0px 20px;
+    margin: 0 0 20px;
+    border-left: 5px solid #eee;
+}
+
+main {
+    margin-top: 100px;
+}
+
+.flex-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+article {
+    margin-top: 30px;
+}
+
+footer {
+    margin-top: 20px;
+}
+
+pre {
+    padding: 0px;
+}
+
+body h2 {
+    margin-bottom: 3px;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.04;
+    letter-spacing: -.028em;
+    font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+}
+
+.post-title {
+}
+.author {
+  font-size: 13px;
+}
+.date {
+    display: none;
+}
+time {
+  font-size: 13px;
+}
+footer {
+  font-size: 13px;
+}
+.tags {
+  font-size: 13px;
+}
+.post,
+.listing {
+    width: 90%;
+    max-width: 800px;
+}
+a.list-group-item {
+  border: 0;
+}
+.extract {
+  margin-top: 10px;
+}
+.tag {
+  font-size: 13px;
+  margin-right: 4px;
+}
+
+.navbar-nav {
+    clear:both;
+    margin-left: 0px;
+    padding-left: 0px;
+    font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+    font-size: 15px;
+    padding: 0 0 0 0;
+}
+
+.navbar-default li a, .navbar-default li a:visited {
+    color: #777;
+}
+.navbar-default li a:hover {
+    color: black;
+}
+.navbar-default li {
+    list-style-type: none;
+    font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+    font-size: 21px;
+    color: #777;
+    float: right;
+    padding: 10px 10px 10px 10px;
+}
+
+.navbar-header {
+    float: left;
+    background-color: rgba(255,255,128,1);
+    padding: 10px 10px 10px 10px;
+}
+.navbar-brand {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+}
+
+.navbar-collapse {
+    float: right;
+}
+
+body {
+    margin: 0px;
+}
+
+.footer {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 140px;
+    background: lightgrey;
+}
